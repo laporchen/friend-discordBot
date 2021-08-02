@@ -33,11 +33,11 @@ async def on_message(message):
     if message.author == client.user:
         return
     if message.content.startswith('舔'):
-        nolick(message)
+        await nolick(message)
     elif message.content.startswith('$hello'):
         await message.channel.send('Hello! ' + message.author.name)
     elif message.content == "The 踢":
-        if(message.author.voice.channel != None):
+        if(message.author.voice != None):
             chlID = message.author.voice.channel.id
             chl= client.get_channel(chlID)
             member_ids = chl.voice_states.keys()
@@ -50,6 +50,8 @@ async def on_message(message):
             if user:
                 await user.edit(voice_channel=None)
                 await message.channel.send(user.mention + "下去")
+        else:
+            await message.channel.send(message.author.mention + "馬的，進語音再用")
     elif message.content == "射":
         if(message.author.voice.channel != None):
             if(random.randint(0,5) == 0):
@@ -57,6 +59,8 @@ async def on_message(message):
                 await message.author.edit(voice_channel=None)
             else:
                 await message.channel.send(message.author.mention + "差點把自己踢出去")
+        else:
+            await message.channel.send(message.author.mention + "馬的，進語音再用")
         
 
         
