@@ -2,7 +2,6 @@ import discord
 import json
 import random
 
-
 keyPath = "key.json"
 
 
@@ -53,6 +52,10 @@ async def kick(message):
     else:
         await message.channel.send(message.author.mention + "馬的，進語音再用")
 
+async def joinVoice(authorchannel):
+    channel = authorchannel
+    await channel.connect()
+
 client = discord.Client()
 
 @client.event
@@ -68,13 +71,11 @@ async def on_message(message):
     elif message.content.startswith('$hello'):
         await message.channel.send('Hello! ' + message.author.name)
     elif message.content == "The 踢":
-        kick(message)
+        await kick(message)
     elif message.content == "射":
-        roulette(message)
+        await roulette(message)
     elif message.content.find("閃現") != -1:
         await flash(message)
-
-        
 
         
 intents = discord.Intents().all()
