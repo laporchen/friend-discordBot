@@ -71,7 +71,7 @@ async def on_message(message):
         kick(message)
     elif message.content == "射":
         roulette(message)
-    elif message.content.find("閃現"):
+    elif message.content.find("閃現") != -1:
         await flash(message)
 
         
