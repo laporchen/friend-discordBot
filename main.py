@@ -4,7 +4,6 @@ import random
 
 keyPath = "key.json"
 
-
 def getKey(path):
     with open(path,'rb') as f:
         data = json.load(f)
@@ -26,7 +25,7 @@ async def flash(message):
     await sendPic(flash,message.channel)
 
 async def roulette(message):
-    if(message.author.voice.channel != None):
+    if(message.author.voice != None):
         if(random.randint(0,5) == 0):
             await message.channel.send(message.author.mention + "射到自己了")
             await message.author.edit(voice_channel=None)
@@ -76,7 +75,6 @@ async def on_message(message):
         await roulette(message)
     elif message.content.find("閃現") != -1:
         await flash(message)
-
         
 intents = discord.Intents().all()
 key = getKey(keyPath)
