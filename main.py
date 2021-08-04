@@ -1,14 +1,27 @@
+from shlex import join
 import discord
 import json
+import ffmpeg
 import random
-
+from discord import client
+from discord import FFmpegPCMAudio
 keyPath = "key.json"
+
+
 
 def getKey(path):
     with open(path,'rb') as f:
         data = json.load(f)
         return data['Key']
 
+def getAudio(path):
+    return FFmpegPCMAudio("audio/" + path)
+
+async def checkInVoice(message):
+    voice = discord.utils.get(client.voice_clients, guild=message.author.guild)
+    if voice == None:
+        return None
+    return voice
 async def sendPic(file,channel):
     with open('img/' + file, 'rb') as f:
         picture = discord.File(f)
@@ -51,9 +64,38 @@ async def kick(message):
     else:
         await message.channel.send(message.author.mention + "馬的，進語音再用")
 
-async def joinVoice(authorchannel):
-    channel = authorchannel
-    await channel.connect()
+async def joinVoice(message):
+    if message.author.voice:
+        voice = discord.utils.get(client.voice_clients, guild=message.author.guild)
+        if(voice == None):
+            channel = message.author.voice.channel
+            await channel.connect()
+            await message.channel.send("來了啦幹")
+        else:
+            await message.channel.send(message.author.mention + "我已經在語音了 北七")
+    else:
+        await message.channel.send(message.author.mention + "馬的，進語音再用")
+
+async def disconnect(message):
+    for x in client.voice_clients:
+        if(x.guild == message.author.guild):
+            await message.channel.send("FK U ALL")
+            await x.disconnect()
+
+async def lickVoice(message):
+    source = getAudio("lick.mp3")
+    voice_client = await checkInVoice(message)
+    print(type(source))
+    if voice_client == None:
+        if message.author.voice:
+            voice_client = await message.author.voice.channel.connect()
+        else:
+            await message.channel.send(message.author.mention + "先進語音")
+    if not voice_client.is_playing():
+        await message.channel.send(message.author.mention + "統神直接爆氣給你看")
+        player = voice_client.play(source)
+    else:
+        await message.channel.send(message.author.mention + "先讓我播完")
 
 client = discord.Client()
 
@@ -65,6 +107,7 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+
     if message.content.startswith('舔'):
         await nolick(message)
     elif message.content.startswith('$hello'):
@@ -75,7 +118,17 @@ async def on_message(message):
         await roulette(message)
     elif message.content.find("閃現") != -1:
         await flash(message)
-        
+    elif message.content == "我叫你進":
+        await joinVoice(message)
+    elif message.content == "滾":
+        voice = discord.utils.get(client.voice_clients, guild=message.author.guild)
+        if voice == None:
+            await message.channel.send(message.author.mention + "我沒在語音好ㄇ")
+        else:
+            await disconnect(message)
+    elif message.content == "在語音舔":
+        await lickVoice(message)
+
 intents = discord.Intents().all()
 key = getKey(keyPath)
 client.run(key)
