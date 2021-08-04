@@ -1,7 +1,6 @@
 from shlex import join
 import discord
 import json
-import ffmpeg
 import random
 from discord import client
 from discord import FFmpegPCMAudio
@@ -36,6 +35,11 @@ async def flash(message):
     flash = "flash.gif"
     await message.channel.send('這什麼到底什麼閃現！')
     await sendPic(flash,message.channel)
+
+async def cry(message):
+    cryImage = "cry.gif"
+    await message.channel.send("哭啊！！！")
+    await sendPic(cryImage,message.channel)
 
 async def roulette(message):
     if(message.author.voice != None):
@@ -99,6 +103,11 @@ async def lickVoice(message):
 
 client = discord.Client()
 
+
+async def queueYT(message):
+    url = message.content.split()[1]
+    
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -128,6 +137,8 @@ async def on_message(message):
             await disconnect(message)
     elif message.content == "在語音舔":
         await lickVoice(message)
+    elif message.content.find("哭啊") != -1:
+        await cry(message)
 
 intents = discord.Intents().all()
 key = getKey(keyPath)
