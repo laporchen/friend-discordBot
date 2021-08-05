@@ -98,6 +98,9 @@ async def getVC(message):
         await message.channel.send(message.author.mention + "先進語音")
 
 async def cheeseVoice(message):
+    if message.author.voice == None:
+        await message.channel.send("進語音啊")
+        return
     source = getAudio("cheese.mp3")
     vc = await checkInVoice(message)
     if( vc == None):
@@ -109,6 +112,9 @@ async def cheeseVoice(message):
         await message.channel.send("奶酪！！！！")
 
 async def lickVoice(message):
+    if message.author.voice == None:
+        await message.channel.send("進語音啊")
+        return  
     source = getAudio("lick.mp3")
     voice_client = await checkInVoice(message)
     if voice_client == None:
