@@ -96,7 +96,7 @@ async def cheeseVoice(message):
     source = getAudio("cheese.mp3")
     vc = await checkInVoice(message)
     if( vc == None):
-        vc = getVC(message)
+        vc = await getVC(message)
     if not vc.is_playing():
         await message.channel.send(message.author.mention + "我去你媽")
         vc.play(source)
