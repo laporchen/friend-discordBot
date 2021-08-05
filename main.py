@@ -13,6 +13,11 @@ def getKey(path):
         data = json.load(f)
         return data['Key']
 
+def getBrian(path):
+    with open(path,'rb') as f:
+        data = json.load(f)
+        return data['brianID']
+
 def getAudio(path):
     return FFmpegPCMAudio("audio/" + path)
 
@@ -100,7 +105,7 @@ async def cheeseVoice(message):
     if not vc.is_playing():
         await message.channel.send(message.author.mention + "我去你媽")
         vc.play(source)
-        sendPic("cheese.jpg",message.channel)
+        await sendPic("cheese.jpg",message.channel)
         await message.channel.send("奶酪！！！！")
 
 async def lickVoice(message):
@@ -114,7 +119,13 @@ async def lickVoice(message):
 
 client = discord.Client()
 
-
+async def brian(message):
+    userId = getBrian(keyPath)
+    user = await message.guild.query_members(user_ids=[userId])
+    msg = ""
+    for i in range(5):
+        msg = msg + user[0].mention  + "打肉叫你上線\n"
+    await message.channel.send(msg)
 async def queueYT(message):
     url = message.content.split()[1]
     
@@ -152,6 +163,8 @@ async def on_message(message):
         await cry(message)
     elif message.content == "你媽的奶酪":
         await cheeseVoice(message)
+    elif message.content == "打肉布萊恩":
+        await brian(message)
 
 intents = discord.Intents().all()
 key = getKey(keyPath)
