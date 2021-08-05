@@ -118,7 +118,7 @@ async def lickVoice(message):
     source = getAudio("lick.mp3")
     voice_client = await checkInVoice(message)
     if voice_client == None:
-        voice_client = getVC(message)
+        voice_client = await getVC(message)
     if not voice_client.is_playing():
         await message.channel.send(message.author.mention + "統神直接爆氣給你看")
         voice_client.play(source)
