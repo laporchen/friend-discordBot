@@ -86,20 +86,31 @@ async def disconnect(message):
             await message.channel.send("FK U ALL")
             await x.disconnect()
 
+async def getVC(message):
+    if message.author.voice:
+        return await message.author.voice.channel.connect()
+    else:
+        await message.channel.send(message.author.mention + "先進語音")
+
+async def cheeseVoice(message):
+    source = getAudio("cheese.mp3")
+    vc = await checkInVoice(message)
+    if( vc == None):
+        vc = getVC(message)
+    if not vc.is_playing():
+        await message.channel.send(message.author.mention + "我去你媽")
+        vc.play(source)
+        sendPic("cheese.jpg",message.channel)
+        await message.channel.send("奶酪！！！！")
+
 async def lickVoice(message):
     source = getAudio("lick.mp3")
     voice_client = await checkInVoice(message)
-    print(type(source))
     if voice_client == None:
-        if message.author.voice:
-            voice_client = await message.author.voice.channel.connect()
-        else:
-            await message.channel.send(message.author.mention + "先進語音")
+        voice_client = getVC(message)
     if not voice_client.is_playing():
         await message.channel.send(message.author.mention + "統神直接爆氣給你看")
-        player = voice_client.play(source)
-    else:
-        await message.channel.send(message.author.mention + "先讓我播完")
+        voice_client.play(source)
 
 client = discord.Client()
 
@@ -139,6 +150,8 @@ async def on_message(message):
         await lickVoice(message)
     elif message.content.find("哭啊") != -1:
         await cry(message)
+    elif message.content == "你媽的奶酪":
+        await cheeseVoice(message)
 
 intents = discord.Intents().all()
 key = getKey(keyPath)
