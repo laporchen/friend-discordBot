@@ -195,7 +195,7 @@ async def roll(ctx,arg='6'):
     top = 6
     if arg and arg.isnumeric():
         top = int(arg)
-    if not arg.numeric():
+    if not arg.isnumeric():
         await ctx.send(ctx.author.mention + "同學，這不是數字")
         return
     await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1,top)))
