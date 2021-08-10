@@ -1,12 +1,12 @@
-from shlex import join
+import os
 import discord
 import json
 import random
 from discord import client
 from discord import FFmpegPCMAudio
+from discord.ext import commands
+import youtube_dl 
 keyPath = "key.json"
-
-
 
 def getKey(path):
     with open(path,'rb') as f:
@@ -20,6 +20,22 @@ def getBrian(path):
 
 def getAudio(path):
     return FFmpegPCMAudio("audio/" + path)
+
+async def getYTDLSource(url):
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    for file in os.listdir("./"):
+        if file.endswith(".mp3"):
+            os.rename(file, 'song.mp3')
+    return discord.FFmpegPCMAudio("song.mp3")
 
 async def checkInVoice(message):
     voice = discord.utils.get(client.voice_clients, guild=message.author.guild)
@@ -123,7 +139,7 @@ async def lickVoice(message):
         await message.channel.send(message.author.mention + "統神直接爆氣給你看")
         voice_client.play(source)
 
-client = discord.Client()
+client = commands.Bot(command_prefix='$')
 
 async def brian(message):
     userId = getBrian(keyPath)
@@ -171,6 +187,35 @@ async def on_message(message):
         await cheeseVoice(message)
     elif message.content == "打肉布萊恩":
         await brian(message)
+    await client.process_commands(message)
+
+
+@client.command(pass_context=True)
+async def roll(ctx,arg='6'):
+    top = 6
+    if arg and arg.isnumeric():
+        top = int(arg)
+    if not arg.numeric():
+        await ctx.send(ctx.author.mention + "同學，這不是數字")
+        return
+    await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1,top)))
+async def queue(ctx,arg=''):
+    pass
+    channel = ctx.message.author.voice.channel
+    if not channel:
+        await ctx.send("想聽歌還不進語音啊 馬的")
+        return
+    
+    voice_client = await checkInVoice(ctx)
+    if voice_client == None:
+        voice_client = await getVC(ctx)
+    if(arg == ''):
+        await ctx.send(ctx.author.mention + " 你沒給網址")
+        return
+    source = getAudio("lick.mp3")
+    
+    
+
 
 intents = discord.Intents().all()
 key = getKey(keyPath)
