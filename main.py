@@ -198,6 +198,8 @@ async def roll(ctx,arg='6'):
     if not arg.isnumeric():
         await ctx.send(ctx.author.mention + "同學，這不是數字")
         return
+    if top == 0:
+        await ctx.send(ctx.author.mention + " 0點你是要骰啥")
     await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1,top)))
 async def queue(ctx,arg=''):
     pass
