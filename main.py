@@ -167,15 +167,15 @@ async def queueYT(message):
     url = message.content.split()[1]
 
 async def rat(message):
-    if(await checkVoice(message)):
-        return 
     source = getAudio("rat.mp3")
-    voice_client = await checkInVoice(message)
-    if voice_client == None:
-        voice_client = await getVC(message)
-    if not voice_client.is_playing():
-        await message.channel.send("勞贖")
-        voice_client.play(source)
+    await sendPic("rat.png")
+    await message.channel.send("勞贖")
+    if message.author.voice != None:
+        voice_client = await checkInVoice(message)
+        if voice_client == None:
+            voice_client = await getVC(message)
+        if not voice_client.is_playing():
+            voice_client.play(source)
 
 @client.event
 async def on_ready():
@@ -185,7 +185,6 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    
     if message.content.startswith('舔'):
         await nolick(message)
     elif message.content.startswith('$hello'):

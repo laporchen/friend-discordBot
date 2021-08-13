@@ -1,0 +1,1 @@
+ssh ubuntu@132.226.0.65 -i ~/.ssh/oracle-discordBot-ssh.key
