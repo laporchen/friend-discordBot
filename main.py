@@ -8,6 +8,12 @@ from discord.ext import commands
 import youtube_dl 
 keyPath = "key.json"
 
+async def checkVoice(message):
+    if message.author.voice == None:
+        await message.channel.send("進語音啊")
+        return False
+    return True
+
 def getKey(path):
     with open(path,'rb') as f:
         data = json.load(f)
@@ -114,9 +120,8 @@ async def getVC(message):
         await message.channel.send(message.author.mention + "先進語音")
 
 async def cheeseVoice(message):
-    if message.author.voice == None:
-        await message.channel.send("進語音啊")
-        return
+    if(await checkVoice(message)):
+        return 
     source = getAudio("cheese.mp3")
     vc = await checkInVoice(message)
     if( vc == None):
@@ -128,8 +133,7 @@ async def cheeseVoice(message):
         await message.channel.send("奶酪！！！！")
 
 async def lickVoice(message):
-    if message.author.voice == None:
-        await message.channel.send("進語音啊")
+    if(await checkVoice(message)):
         return  
     source = getAudio("lick.mp3")
     voice_client = await checkInVoice(message)
@@ -148,9 +152,30 @@ async def brian(message):
     for i in range(5):
         msg = msg + user[0].mention  + "打肉叫你上線\n"
     await message.channel.send(msg)
+
 async def queueYT(message):
+    if(await checkVoice(message)):
+        return   
+    source = getAudio("lick.mp3")
+    voice_client = await checkInVoice(message)
+    if voice_client == None:
+        voice_client = await getVC(message)
+    if not voice_client.is_playing():
+        await message.channel.send(message.author.mention + "統神直接爆氣給你看")
+        voice_client.play(source)
+
     url = message.content.split()[1]
-    
+
+async def rat(message):
+    if(await checkVoice(message)):
+        return 
+    source = getAudio(rat.mp3)
+    voice_client = await checkInVoice(message)
+    if voice_client == None:
+        voice_client = await getVC(message)
+    if not voice_client.is_playing():
+        await message.channel.send("勞贖")
+        voice_client.play(source)
 
 @client.event
 async def on_ready():
@@ -160,7 +185,7 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-
+    
     if message.content.startswith('舔'):
         await nolick(message)
     elif message.content.startswith('$hello'):
@@ -187,6 +212,8 @@ async def on_message(message):
         await cheeseVoice(message)
     elif message.content == "打肉布萊恩":
         await brian(message)
+    elif message.content.find("老鼠") != -1:
+        await rat(message)
     await client.process_commands(message)
 
 
@@ -200,6 +227,7 @@ async def roll(ctx,arg='6'):
         return
     if top == 0:
         await ctx.send(ctx.author.mention + " 0點你是要骰啥")
+        return
     await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1,top)))
 async def queue(ctx,arg=''):
     pass
