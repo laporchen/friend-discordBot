@@ -169,7 +169,7 @@ async def queueYT(message):
 async def rat(message):
     if(await checkVoice(message)):
         return 
-    source = getAudio(rat.mp3)
+    source = getAudio("rat.mp3")
     voice_client = await checkInVoice(message)
     if voice_client == None:
         voice_client = await getVC(message)
