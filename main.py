@@ -11,8 +11,8 @@ keyPath = "key.json"
 async def checkVoice(message):
     if message.author.voice == None:
         await message.channel.send("進語音啊")
-        return False
-    return True
+        return True
+    return False
 
 def getKey(path):
     with open(path,'rb') as f:
