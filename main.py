@@ -19,10 +19,10 @@ def getKey(path):
         data = json.load(f)
         return data['Key']
 
-def getBrian(path):
+def getID(path,name):
     with open(path,'rb') as f:
         data = json.load(f)
-        return data['brianID']
+        return data[name]
 
 def getAudio(path):
     return FFmpegPCMAudio("audio/" + path)
@@ -146,13 +146,19 @@ async def lickVoice(message):
 client = commands.Bot(command_prefix='$')
 
 async def brian(message):
-    userId = getBrian(keyPath)
+    userId = getID(keyPath,"brianID")
     user = await message.guild.query_members(user_ids=[userId])
     msg = ""
     for i in range(5):
         msg = msg + user[0].mention  + "打肉叫你上線\n"
     await message.channel.send(msg)
-
+async def dazzle(message):
+    userId = getID(keyPath,"dazzle")
+    user = await message.guild.query_members(user_ids=[userId])
+    msg = ""
+    for i in range(5):
+        msg = msg + user[0].mention  + "布萊恩好像叫你上線\n"
+    await message.channel.send(msg)
 async def queueYT(message):
     if(await checkVoice(message)):
         return   
@@ -168,7 +174,7 @@ async def queueYT(message):
 
 async def rat(message):
     source = getAudio("rat.mp3")
-    await sendPic("rat.png")
+    await sendPic("rat.png",message.channel)
     await message.channel.send("勞贖")
     if message.author.voice != None:
         voice_client = await checkInVoice(message)
@@ -211,6 +217,8 @@ async def on_message(message):
         await cheeseVoice(message)
     elif message.content == "打肉布萊恩":
         await brian(message)
+    elif message.content == "打肉打肉":
+        await dazzle(message)
     elif message.content.find("老鼠") != -1:
         await rat(message)
     await client.process_commands(message)
