@@ -224,10 +224,10 @@ async def cat(message):
 
 
 async def huh(message):
-    url = "https://api.giphy.com/v1/gifs/trending?api_key=" + getID(keyPath,"giphy") + "&limit=1&rating=g"
+    url = "https://api.giphy.com/v1/gifs/random?api_key=" + getID(keyPath,"giphy") + "&rating=g"
     respone = requests.get(url)
     js = respone.json()
-    gif = js["data"][0]["url"]
+    gif = js["data"]["url"]
    
     await message.channel.send("蛤")
     await message.channel.send(gif)
