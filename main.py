@@ -5,8 +5,12 @@ import random
 from discord import client
 from discord import FFmpegPCMAudio
 from discord.ext import commands
-import youtube_dl 
+import requests
+import youtube_dl
+import urllib
+from io import BytesIO
 keyPath = "key.json"
+
 
 async def checkVoice(message):
     if message.author.voice == None:
@@ -14,18 +18,22 @@ async def checkVoice(message):
         return True
     return False
 
+
 def getKey(path):
-    with open(path,'rb') as f:
+    with open(path, 'rb') as f:
         data = json.load(f)
         return data['Key']
 
-def getID(path,name):
-    with open(path,'rb') as f:
+
+def getID(path, name):
+    with open(path, 'rb') as f:
         data = json.load(f)
         return data[name]
 
+
 def getAudio(path):
     return FFmpegPCMAudio("audio/" + path)
+
 
 async def getYTDLSource(url):
     ydl_opts = {
@@ -43,34 +51,42 @@ async def getYTDLSource(url):
             os.rename(file, 'song.mp3')
     return discord.FFmpegPCMAudio("song.mp3")
 
+
 async def checkInVoice(message):
     voice = discord.utils.get(client.voice_clients, guild=message.author.guild)
     if voice == None:
         return None
     return voice
-async def sendPic(file,channel):
+
+
+async def sendPic(file, channel):
     with open('img/' + file, 'rb') as f:
         picture = discord.File(f)
+
         await channel.send(file=picture)
+
 
 async def nolick(message):
     lick = "lick.jpg"
     await message.channel.send('又舔，又舔，又…又舔嘴唇！')
-    await sendPic(lick,message.channel)
+    await sendPic(lick, message.channel)
+
 
 async def flash(message):
     flash = "flash.gif"
     await message.channel.send('這什麼到底什麼閃現！')
-    await sendPic(flash,message.channel)
+    await sendPic(flash, message.channel)
+
 
 async def cry(message):
     cryImage = "cry.gif"
     await message.channel.send("哭啊！！！")
-    await sendPic(cryImage,message.channel)
+    await sendPic(cryImage, message.channel)
+
 
 async def roulette(message):
     if(message.author.voice != None):
-        if(random.randint(0,5) == 0):
+        if(random.randint(0, 5) == 0):
             await message.channel.send(message.author.mention + "射到自己了")
             await message.author.edit(voice_channel=None)
         else:
@@ -78,26 +94,30 @@ async def roulette(message):
     else:
         await message.channel.send(message.author.mention + "馬的，進語音再用")
 
+
 async def kick(message):
     if(message.author.voice != None):
         chlID = message.author.voice.channel.id
-        chl= client.get_channel(chlID)
+        chl = client.get_channel(chlID)
         member_ids = chl.voice_states.keys()
         memberlist = []
         for id in member_ids:
             memberlist.append(id)
-        userId =random.choice(memberlist)
-        user = await message.guild.query_members(user_ids=[userId]) # list of members with userid
-        user = user[0] # there should be only one so get the first i
+        userId = random.choice(memberlist)
+        # list of members with userid
+        user = await message.guild.query_members(user_ids=[userId])
+        user = user[0]  # there should be only one so get the first i
         if user:
             await user.edit(voice_channel=None)
             await message.channel.send(user.mention + "下去")
     else:
         await message.channel.send(message.author.mention + "馬的，進語音再用")
 
+
 async def joinVoice(message):
     if message.author.voice:
-        voice = discord.utils.get(client.voice_clients, guild=message.author.guild)
+        voice = discord.utils.get(
+            client.voice_clients, guild=message.author.guild)
         if(voice == None):
             channel = message.author.voice.channel
             await channel.connect()
@@ -107,11 +127,13 @@ async def joinVoice(message):
     else:
         await message.channel.send(message.author.mention + "馬的，進語音再用")
 
+
 async def disconnect(message):
     for x in client.voice_clients:
         if(x.guild == message.author.guild):
             await message.channel.send("FK U ALL")
             await x.disconnect()
+
 
 async def getVC(message):
     if message.author.voice:
@@ -119,22 +141,24 @@ async def getVC(message):
     else:
         await message.channel.send(message.author.mention + "先進語音")
 
+
 async def cheeseVoice(message):
     if(await checkVoice(message)):
-        return 
+        return
     source = getAudio("cheese.mp3")
     vc = await checkInVoice(message)
-    if( vc == None):
+    if(vc == None):
         vc = await getVC(message)
     if not vc.is_playing():
         await message.channel.send(message.author.mention + "我去你媽")
         vc.play(source)
-        await sendPic("cheese.jpg",message.channel)
+        await sendPic("cheese.jpg", message.channel)
         await message.channel.send("奶酪！！！！")
+
 
 async def lickVoice(message):
     if(await checkVoice(message)):
-        return  
+        return
     source = getAudio("lick.mp3")
     voice_client = await checkInVoice(message)
     if voice_client == None:
@@ -145,23 +169,28 @@ async def lickVoice(message):
 
 client = commands.Bot(command_prefix='$')
 
+
 async def brian(message):
-    userId = getID(keyPath,"brianID")
+    userId = getID(keyPath, "brianID")
     user = await message.guild.query_members(user_ids=[userId])
     msg = ""
     for i in range(5):
-        msg = msg + user[0].mention  + "打肉叫你上線\n"
+        msg = msg + user[0].mention + "打肉叫你上線\n"
     await message.channel.send(msg)
+
+
 async def dazzle(message):
-    userId = getID(keyPath,"dazzle")
+    userId = getID(keyPath, "dazzle")
     user = await message.guild.query_members(user_ids=[userId])
     msg = ""
     for i in range(5):
-        msg = msg + user[0].mention  + "布萊恩好像叫你上線\n"
+        msg = msg + user[0].mention + "布萊恩好像叫你上線\n"
     await message.channel.send(msg)
+
+
 async def queueYT(message):
     if(await checkVoice(message)):
-        return   
+        return
     source = getAudio("lick.mp3")
     voice_client = await checkInVoice(message)
     if voice_client == None:
@@ -172,9 +201,10 @@ async def queueYT(message):
 
     url = message.content.split()[1]
 
+
 async def rat(message):
     source = getAudio("rat.mp3")
-    await sendPic("rat.png",message.channel)
+    await sendPic("rat.png", message.channel)
     await message.channel.send("勞贖")
     if message.author.voice != None:
         voice_client = await checkInVoice(message)
@@ -183,9 +213,30 @@ async def rat(message):
         if not voice_client.is_playing():
             voice_client.play(source)
 
+
+async def cat(message):
+    url = "https://cataas.com/cat"
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content))
+    img.save("img/cat.jpg")
+    await sendPic("cat.jpg", message.channel)
+    return
+
+
+async def huh(message):
+    url = "https://api.giphy.com/v1/gifs/trending?api_key=" + getID(keyPath,"giphy") + "&limit=1&rating=g"
+    respone = requests.get(url)
+    js = respone.json()
+    gif = js["data"][0]["url"]
+   
+    await message.channel.send("蛤")
+    await message.channel.send(gif)
+
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+
 
 @client.event
 async def on_message(message):
@@ -204,7 +255,8 @@ async def on_message(message):
     elif message.content == "我叫你進":
         await joinVoice(message)
     elif message.content == "滾":
-        voice = discord.utils.get(client.voice_clients, guild=message.author.guild)
+        voice = discord.utils.get(
+            client.voice_clients, guild=message.author.guild)
         if voice == None:
             await message.channel.send(message.author.mention + "我沒在語音好ㄇ")
         else:
@@ -219,13 +271,17 @@ async def on_message(message):
         await brian(message)
     elif message.content == "打肉打肉":
         await dazzle(message)
+    elif message.content.find("卯咪") != -1:
+        await cat(message)
+    elif message.content.find("蛤") != -1:
+        await huh(message)
     elif message.content.find("老鼠") != -1:
         await rat(message)
     await client.process_commands(message)
 
 
 @client.command(pass_context=True)
-async def roll(ctx,arg='6'):
+async def roll(ctx, arg='6'):
     top = 6
     if arg and arg.isnumeric():
         top = int(arg)
@@ -235,14 +291,16 @@ async def roll(ctx,arg='6'):
     if top == 0:
         await ctx.send(ctx.author.mention + " 0點你是要骰啥")
         return
-    await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1,top)))
-async def queue(ctx,arg=''):
+    await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1, top)))
+
+
+async def queue(ctx, arg=''):
     pass
     channel = ctx.message.author.voice.channel
     if not channel:
         await ctx.send("想聽歌還不進語音啊 馬的")
         return
-    
+
     voice_client = await checkInVoice(ctx)
     if voice_client == None:
         voice_client = await getVC(ctx)
@@ -250,8 +308,6 @@ async def queue(ctx,arg=''):
         await ctx.send(ctx.author.mention + " 你沒給網址")
         return
     source = getAudio("lick.mp3")
-    
-    
 
 
 intents = discord.Intents().all()
