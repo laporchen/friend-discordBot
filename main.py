@@ -215,12 +215,14 @@ async def rat(message):
 
 
 async def cat(message):
-    url = "https://cataas.com/cat"
-    response = requests.get(url)
-    img = Image.open(BytesIO(response.content))
-    img.save("img/cat.jpg")
-    await sendPic("cat.jpg", message.channel)
-    return
+    url = "https://api.giphy.com/v1/gifs/search?api_key=" + getID(keyPath,"giphy") + "&q=cat&rating=g&limit=1"
+    respone = requests.get(url)
+    js = respone.json()
+    #print(js)
+    gif = js["data"][0]["url"]
+
+    await message.channel.send("貓")
+    await message.channel.send(gif)
 
 
 async def huh(message):
@@ -228,7 +230,7 @@ async def huh(message):
     respone = requests.get(url)
     js = respone.json()
     gif = js["data"]["url"]
-   
+    
     await message.channel.send("蛤")
     await message.channel.send(gif)
 
