@@ -224,6 +224,15 @@ async def cat(message):
     await message.channel.send("貓")
     await message.channel.send(gif)
 
+async def duck(message):
+    url = "https://api.giphy.com/v1/gifs/random?api_key=" + getID(keyPath,"giphy") + "&rating=g&tag=duck"
+    respone = requests.get(url)
+    js = respone.json()
+    #print(js)
+    gif = js["data"]["url"]
+
+    await message.channel.send("鴨鴨")
+    await message.channel.send(gif)
 
 async def huh(message):
     url = "https://api.giphy.com/v1/gifs/random?api_key=" + getID(keyPath,"giphy") + "&rating=g"
@@ -275,6 +284,8 @@ async def on_message(message):
         await dazzle(message)
     elif message.content.find("卯咪") != -1:
         await cat(message)
+    elif message.content.find("鴨子") != -1:
+        await duck(message)
     elif message.content.find("蛤") != -1:
         await huh(message)
     elif message.content.find("老鼠") != -1:
