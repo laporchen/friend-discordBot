@@ -215,11 +215,11 @@ async def rat(message):
 
 
 async def cat(message):
-    url = "https://api.giphy.com/v1/gifs/search?api_key=" + getID(keyPath,"giphy") + "&q=cat&rating=g&limit=1"
+    url = "https://api.giphy.com/v1/gifs/random?api_key=" + getID(keyPath,"giphy") + "&rating=g&tag=cat"
     respone = requests.get(url)
     js = respone.json()
     #print(js)
-    gif = js["data"][0]["url"]
+    gif = js["data"]["url"]
 
     await message.channel.send("貓")
     await message.channel.send(gif)
