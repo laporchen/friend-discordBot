@@ -6,17 +6,18 @@ from discord import client
 from discord import FFmpegPCMAudio
 from discord.ext import commands
 import requests
-import youtube_dl
-import urllib
-from io import BytesIO
-keyPath = "key.json"
+import libWordle as wd
+keyPath = "../key.json"
 
+# wordle variables
+wordleGameStarted = False
+wordList = []
+puzzle = ""
+guessCount = 0
+guessResult = []
+# end wordle
 
-async def checkVoice(message):
-    if message.author.voice == None:
-        await message.channel.send("進語音啊")
-        return True
-    return False
+client = commands.Bot(command_prefix='$')
 
 
 def getKey(path):
@@ -32,24 +33,7 @@ def getID(path, name):
 
 
 def getAudio(path):
-    return FFmpegPCMAudio("audio/" + path)
-
-
-async def getYTDLSource(url):
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-    }
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-    for file in os.listdir("./"):
-        if file.endswith(".mp3"):
-            os.rename(file, 'song.mp3')
-    return discord.FFmpegPCMAudio("song.mp3")
+    return FFmpegPCMAudio("../audio/" + path)
 
 
 async def checkInVoice(message):
@@ -60,7 +44,7 @@ async def checkInVoice(message):
 
 
 async def sendPic(file, channel):
-    with open('img/' + file, 'rb') as f:
+    with open('../img/' + file, 'rb') as f:
         picture = discord.File(f)
 
         await channel.send(file=picture)
@@ -167,8 +151,6 @@ async def lickVoice(message):
         await message.channel.send(message.author.mention + "統神直接爆氣給你看")
         voice_client.play(source)
 
-client = commands.Bot(command_prefix='$')
-
 
 async def brian(message):
     userId = getID(keyPath, "brianID")
@@ -188,20 +170,6 @@ async def dazzle(message):
     await message.channel.send(msg)
 
 
-async def queueYT(message):
-    if(await checkVoice(message)):
-        return
-    source = getAudio("lick.mp3")
-    voice_client = await checkInVoice(message)
-    if voice_client == None:
-        voice_client = await getVC(message)
-    if not voice_client.is_playing():
-        await message.channel.send(message.author.mention + "統神直接爆氣給你看")
-        voice_client.play(source)
-
-    url = message.content.split()[1]
-
-
 async def rat(message):
     source = getAudio("rat.mp3")
     await sendPic("rat.png", message.channel)
@@ -215,33 +183,45 @@ async def rat(message):
 
 
 async def cat(message):
-    url = "https://api.giphy.com/v1/gifs/random?api_key=" + getID(keyPath,"giphy") + "&rating=g&tag=cat"
+    url = "https://api.giphy.com/v1/gifs/random?api_key=" + \
+        getID(keyPath, "giphy") + "&rating=g&tag=cat"
     respone = requests.get(url)
     js = respone.json()
-    #print(js)
+    # print(js)
     gif = js["data"]["url"]
 
     await message.channel.send("貓")
     await message.channel.send(gif)
 
+
 async def duck(message):
-    url = "https://api.giphy.com/v1/gifs/random?api_key=" + getID(keyPath,"giphy") + "&rating=g&tag=duck"
+    url = "https://api.giphy.com/v1/gifs/random?api_key=" + \
+        getID(keyPath, "giphy") + "&rating=g&tag=duck"
     respone = requests.get(url)
     js = respone.json()
-    #print(js)
+    # print(js)
     gif = js["data"]["url"]
 
     await message.channel.send("鴨鴨")
     await message.channel.send(gif)
 
+
 async def huh(message):
-    url = "https://api.giphy.com/v1/gifs/random?api_key=" + getID(keyPath,"giphy") + "&rating=g"
+    url = "https://api.giphy.com/v1/gifs/random?api_key=" + \
+        getID(keyPath, "giphy") + "&rating=g"
     respone = requests.get(url)
     js = respone.json()
     gif = js["data"]["url"]
-    
+
     await message.channel.send("蛤")
     await message.channel.send(gif)
+
+
+async def checkVoice(message):
+    if message.author.voice == None:
+        await message.channel.send("進語音啊")
+        return True
+    return False
 
 
 @client.event
@@ -284,8 +264,6 @@ async def on_message(message):
         await dazzle(message)
     elif message.content.find("卯咪") != -1:
         await cat(message)
-    elif message.content.find("鴨子") != -1:
-        await duck(message)
     elif message.content.find("蛤") != -1:
         await huh(message)
     elif message.content.find("老鼠") != -1:
@@ -307,21 +285,38 @@ async def roll(ctx, arg='6'):
     await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1, top)))
 
 
-async def queue(ctx, arg=''):
-    pass
-    channel = ctx.message.author.voice.channel
-    if not channel:
-        await ctx.send("想聽歌還不進語音啊 馬的")
-        return
-
-    voice_client = await checkInVoice(ctx)
-    if voice_client == None:
-        voice_client = await getVC(ctx)
-    if(arg == ''):
-        await ctx.send(ctx.author.mention + " 你沒給網址")
-        return
-    source = getAudio("lick.mp3")
-
+@client.command(pass_context=True)
+async def wordle(ctx, arg="2"):
+    global wordleGameStarted, puzzle, wordList, guessCount, guessResult
+    if(arg == "help"):
+        await ctx.send(ctx.author.mention + " 可以用的指令有：\n" + "$wordle start 開始遊戲\n" + "$wordle <word> 猜字\n")
+    if(arg == "new" and wordleGameStarted == False):
+        wordleGameStarted = True
+        wordList = wd.init()
+        puzzle = wd.gameInit(wordList['words'])
+        guessCount = 0
+        await ctx.send("遊戲開始，輸入$wordle <word> 來進行猜測")
+    elif(arg == "new" and wordleGameStarted == True):
+        await ctx.send("遊戲已經開始了，使用$wordle <word> 來猜")
+    elif (wordleGameStarted):
+        guessCount += 1
+        res = wd.process(
+            arg, puzzle, wordList['words'], wordList['allowGuesses'])
+        guessResult.append(res[1])
+        if(res[0] == True):
+            await ctx.send(res[1])
+            await ctx.send("遊戲結束，猜測次數: " + str(guessCount))
+            guessStr = ""
+            for i in guessResult:
+                guessStr += i + "\n"
+            await ctx.send(guessStr)
+            wordleGameStarted = False
+            return
+        await ctx.send(res[1])
+        if(guessCount > 5):
+            await ctx.send("遊戲結束，輸入$wordle重新開始\n" + "答案是：" + puzzle)
+            wordleGameStarted = False
+            return
 
 intents = discord.Intents().all()
 key = getKey(keyPath)
