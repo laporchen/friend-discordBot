@@ -1,8 +1,5 @@
 import json
 import random
-from re import A
-
-from matplotlib.style import available
 
 
 wordPath = "./words.json"
