@@ -287,7 +287,7 @@ async def roll(ctx, arg='6'):
     await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1, top)))
 
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=['wd'])
 async def wordle(ctx, arg="2"):
     serverId = str(ctx.guild.id)
     global wordleGameStarted, puzzle, wordList, guessCount, guessResult
@@ -297,7 +297,7 @@ async def wordle(ctx, arg="2"):
         guessCount[serverId] = 0
         guessResult[serverId] = []
     if(arg == "help"):
-        await ctx.send(ctx.author.mention + " 可以用的指令有：\n" + "$wordle start 開始遊戲\n" + "$wordle word 猜字\n")
+        await ctx.send(ctx.author.mention + " 可以用的指令有：\n" + "$wordle start 開始遊戲\n" + "$wd word 猜字\n")
     if(arg == "new" and wordleGameStarted[serverId] == False):
         wordleGameStarted[serverId] = True
         wordList = wd.init()
@@ -322,7 +322,7 @@ async def wordle(ctx, arg="2"):
             return
         await ctx.send(res[1])
         if(guessCount[serverId] > 5):
-            await ctx.send("遊戲結束，輸入$wordle重新開始\n" + "答案是：" + puzzle[serverId])
+            await ctx.send("遊戲結束，輸入$wordle new 重新開始\n" + "答案是：" + puzzle[serverId])
             wordleGameStarted[serverId] = False
             return
 
