@@ -295,9 +295,9 @@ async def wordle(ctx, arg="2"):
         wordleGameStarted[serverId] = False
         puzzle[serverId] = ""
         guessCount[serverId] = 0
-        guessResult[serverId] = {}
+        guessResult[serverId] = []
     if(arg == "help"):
-        await ctx.send(ctx.author.mention + " 可以用的指令有：\n" + "$wordle start 開始遊戲\n" + "$wordle <word> 猜字\n")
+        await ctx.send(ctx.author.mention + " 可以用的指令有：\n" + "$wordle start 開始遊戲\n" + "$wordle word 猜字\n")
     if(arg == "new" and wordleGameStarted[serverId] == False):
         wordleGameStarted[serverId] = True
         wordList = wd.init()
