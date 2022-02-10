@@ -307,10 +307,13 @@ async def wordle(ctx, arg="2"):
     elif(arg == "new" and wordleGameStarted[serverId] == True):
         await ctx.send("遊戲已經開始了，使用$wordle <word> 來猜")
     elif (wordleGameStarted[serverId]):
-        guessCount[serverId] += 1
         res = wd.process(
             arg, puzzle[serverId], wordList['words'], wordList['allowGuesses'])
+        if(res[2] == False):
+            await ctx.send(ctx.author.mention + res[1])
+            return
         guessResult[serverId].append(res[1])
+        guessCount[serverId] += 1
         if(res[0] == True):
             await ctx.send(res[1])
             await ctx.send("遊戲結束，猜測次數: " + str(guessCount[serverId]))

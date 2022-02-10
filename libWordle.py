@@ -43,13 +43,13 @@ def checkWord(word, puzzle):
 
 def process(word, puzzle, wordList, allowGuesses):
     if(len(word) != 5):
-        errMsg = "請輸入五個字母！"
-        return [False, errMsg]
+        errMsg = "請輸入五個字母"
+        return [False, errMsg, False]
     if(not validateWord(wordList, allowGuesses, word)):
-        errMsg = "此單字不在詞庫裡！"
-        return [False, errMsg]
+        errMsg = "此單字不在詞庫裡"
+        return [False, errMsg, False]
     result = checkWord(word, puzzle)
     if(result.count("🟩") == 5):
-        return [True, result]
+        return [True, result, True]
     else:
-        return [False, result]
+        return [False, result, True]
