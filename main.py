@@ -1,4 +1,6 @@
+from http import server
 import os
+from re import S
 import discord
 import json
 import random
@@ -7,14 +9,14 @@ from discord import FFmpegPCMAudio
 from discord.ext import commands
 import requests
 import libWordle as wd
-keyPath = "../key.json"
+keyPath = "./key.json"
 
 # wordle variables
-wordleGameStarted = False
+wordleGameStarted = {}
 wordList = []
-puzzle = ""
-guessCount = 0
-guessResult = []
+puzzle = {}
+guessCount = {}
+guessResult = {}
 # end wordle
 
 client = commands.Bot(command_prefix='$')
@@ -287,35 +289,41 @@ async def roll(ctx, arg='6'):
 
 @client.command(pass_context=True)
 async def wordle(ctx, arg="2"):
+    serverId = str(ctx.guild.id)
     global wordleGameStarted, puzzle, wordList, guessCount, guessResult
+    if(serverId not in wordleGameStarted):
+        wordleGameStarted[serverId] = False
+        puzzle[serverId] = ""
+        guessCount[serverId] = 0
+        guessResult[serverId] = {}
     if(arg == "help"):
         await ctx.send(ctx.author.mention + " 可以用的指令有：\n" + "$wordle start 開始遊戲\n" + "$wordle <word> 猜字\n")
-    if(arg == "new" and wordleGameStarted == False):
-        wordleGameStarted = True
+    if(arg == "new" and wordleGameStarted[serverId] == False):
+        wordleGameStarted[serverId] = True
         wordList = wd.init()
-        puzzle = wd.gameInit(wordList['words'])
-        guessCount = 0
+        puzzle[serverId] = wd.gameInit(wordList['words'])
+        guessCount[serverId] = 0
         await ctx.send("遊戲開始，輸入$wordle <word> 來進行猜測")
-    elif(arg == "new" and wordleGameStarted == True):
+    elif(arg == "new" and wordleGameStarted[serverId] == True):
         await ctx.send("遊戲已經開始了，使用$wordle <word> 來猜")
-    elif (wordleGameStarted):
-        guessCount += 1
+    elif (wordleGameStarted[serverId]):
+        wordleGameStarted[serverId] += 1
         res = wd.process(
-            arg, puzzle, wordList['words'], wordList['allowGuesses'])
-        guessResult.append(res[1])
+            arg, puzzle[serverId], wordList['words'], wordList['allowGuesses'])
+        guessResult[serverId].append(res[1])
         if(res[0] == True):
             await ctx.send(res[1])
-            await ctx.send("遊戲結束，猜測次數: " + str(guessCount))
+            await ctx.send("遊戲結束，猜測次數: " + str(guessCount[serverId]))
             guessStr = ""
-            for i in guessResult:
+            for i in guessResult[serverId]:
                 guessStr += i + "\n"
             await ctx.send(guessStr)
-            wordleGameStarted = False
+            wordleGameStarted[serverId] = False
             return
         await ctx.send(res[1])
-        if(guessCount > 5):
-            await ctx.send("遊戲結束，輸入$wordle重新開始\n" + "答案是：" + puzzle)
-            wordleGameStarted = False
+        if(guessCount[serverId] > 5):
+            await ctx.send("遊戲結束，輸入$wordle重新開始\n" + "答案是：" + puzzle[serverId])
+            wordleGameStarted[serverId] = False
             return
 
 intents = discord.Intents().all()
