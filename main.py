@@ -303,6 +303,7 @@ async def wordle(ctx, arg="2"):
         wordList = wd.init()
         puzzle[serverId] = wd.gameInit(wordList['words'])
         guessCount[serverId] = 0
+        guessResult[serverId] = {}
         await ctx.send("遊戲開始，輸入$wordle <word> 來進行猜測")
     elif(arg == "new" and wordleGameStarted[serverId] == True):
         await ctx.send("遊戲已經開始了，使用$wordle <word> 來猜")
