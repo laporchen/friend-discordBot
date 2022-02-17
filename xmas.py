@@ -18,7 +18,7 @@ def drawOnImg(daysDiff):
     img = Image.open("./img/padoru.jpg")
     drawing = ImageDraw.Draw(img)
     font = ImageFont.truetype(
-        font="/System/Library/Fonts/Courier.ttc", size=40)
+        font="./font/serif.ttf", size=40)
     drawing.text((100, 600), text, (255, 255, 255), font=font)
     img.save('./img/xmas.jpg')
     return "xmas.jpg"

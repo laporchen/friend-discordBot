@@ -1,6 +1,3 @@
-from re import S
-from termios import CINTR
-from click import pass_context
 import discord
 import json
 import random
@@ -12,15 +9,8 @@ import datetime
 import xmas
 keyPath = "./key.json"
 
-# wordle variables
-wordleGameStarted = {}
-wordList = []
-puzzle = {}
-guessCount = {}
-guessResult = {}
-# end wordle
 
-client = commands.Bot(command_prefix='!')
+client = commands.Bot(command_prefix='$')
 
 
 def getKey(path):
