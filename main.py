@@ -1,6 +1,6 @@
-from http import server
-import os
 from re import S
+from termios import CINTR
+from click import pass_context
 import discord
 import json
 import random
@@ -8,7 +8,8 @@ from discord import client
 from discord import FFmpegPCMAudio
 from discord.ext import commands
 import requests
-import libWordle as wd
+import datetime
+import xmas
 keyPath = "./key.json"
 
 # wordle variables
@@ -19,7 +20,7 @@ guessCount = {}
 guessResult = {}
 # end wordle
 
-client = commands.Bot(command_prefix='$')
+client = commands.Bot(command_prefix='!')
 
 
 def getKey(path):
@@ -46,7 +47,7 @@ async def checkInVoice(message):
 
 
 async def sendPic(file, channel):
-    with open('../img/' + file, 'rb') as f:
+    with open('./img/' + file, 'rb') as f:
         picture = discord.File(f)
 
         await channel.send(file=picture)
@@ -254,6 +255,8 @@ async def on_message(message):
             await message.channel.send(message.author.mention + "我沒在語音好ㄇ")
         else:
             await disconnect(message)
+    elif message.content == "padoru":
+        await sendPic(xmas.padoru(), message.channel)
     elif message.content == "在語音舔":
         await lickVoice(message)
     elif message.content.find("哭啊") != -1:
@@ -287,49 +290,10 @@ async def roll(ctx, arg='6'):
     await ctx.send(ctx.author.mention + " 骰出了 " + str(random.randrange(1, top)))
 
 
-@client.command(pass_context=True, aliases=['wd'])
-async def wordle(ctx, arg="2"):
-    serverId = str(ctx.guild.id)
-    global wordleGameStarted, puzzle, wordList, guessCount, guessResult
-    if(serverId not in wordleGameStarted):
-        wordleGameStarted[serverId] = False
-        puzzle[serverId] = ""
-        guessCount[serverId] = 0
-        guessResult[serverId] = []
-    if(arg == "help"):
-        await ctx.send(ctx.author.mention + " 可以用的指令有：\n" + "$wordle new 開始遊戲\n" + "$wd word 猜字\n")
-        return
-    if(arg == "new" and wordleGameStarted[serverId] == False):
-        wordleGameStarted[serverId] = True
-        wordList = wd.init()
-        puzzle[serverId] = wd.gameInit(wordList['words'])
-        guessCount[serverId] = 0
-        guessResult[serverId] = []
-        await ctx.send("遊戲開始，輸入$wordle <word> 來進行猜測")
-    elif(arg == "new" and wordleGameStarted[serverId] == True):
-        await ctx.send("遊戲已經開始了，使用$wordle <word> 來猜")
-    elif (wordleGameStarted[serverId]):
-        res = wd.process(
-            arg, puzzle[serverId], wordList['words'], wordList['allowGuesses'])
-        if(res[2] == False):
-            await ctx.send(ctx.author.mention + res[1])
-            return
-        guessResult[serverId].append(res[1])
-        guessCount[serverId] += 1
-        if(res[0] == True):
-            await ctx.send(res[1])
-            await ctx.send("遊戲結束，猜測次數: " + str(guessCount[serverId]))
-            guessStr = ""
-            for i in guessResult[serverId]:
-                guessStr += i + "\n"
-            await ctx.send(guessStr)
-            wordleGameStarted[serverId] = False
-            return
-        await ctx.send(res[1])
-        if(guessCount[serverId] > 5):
-            await ctx.send("遊戲結束，輸入$wordle new 重新開始\n" + "答案是：" + puzzle[serverId])
-            wordleGameStarted[serverId] = False
-            return
+@client.command(pass_context=False)
+async def pardoru():
+    currentTime = datetime.now()
+    chrismasTime = datetime.date(currentTime.year, 12, 25)
 
 intents = discord.Intents().all()
 key = getKey(keyPath)
