@@ -4,17 +4,17 @@ from PIL import Image, ImageFont, ImageDraw
 
 
 def getDiff():
-    currentTime = date.today()
-    xmasTime = date(currentTime.year, 12, 25)
+    currentTime = datetime.today()
+    xmasTime = datetime(currentTime.year, 12, 25)
     if(currentTime > xmasTime):
-        xmasTime = date(currentTime.year+1, 12, 25)
-    daysDiff = (xmasTime - currentTime).days
-    print()
-    return daysDiff
+        xmasTime = datetime(currentTime.year+1, 12, 25, 0, 0, 0)
+    diff = (xmasTime - currentTime)
+    print(diff)
+    return diff
 
 
 def drawOnImg(daysDiff):
-    text = f'Time until next xmas is {daysDiff} days'
+    text = f'Next xmas : {daysDiff.days} days, {daysDiff.seconds//3600} hours, {(daysDiff.seconds//60)%60} minutes'
     img = Image.open("./img/padoru.jpg")
     drawing = ImageDraw.Draw(img)
     font = ImageFont.truetype(
